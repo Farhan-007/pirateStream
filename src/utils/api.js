@@ -1,4 +1,4 @@
-const API_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzMDlmMDUwYjRlYTgyYTBiZjVlMDhjZWVlY2VhMGY1MCIsIm5iZiI6MTcwNzU4MDE2MS4wNTQwMDAxLCJzdWIiOiI2NWM3OWIwMTU0YTA5ODAxNjMwMTE5ZmMiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.cRbUW5xJxG-YPkffVmdviUgor9p2S1cZNAddgLm4gRc";
+const API_TOKEN = import.meta.env.VITE_TMDB_API_TOKEN;
 const BASE_URL = 'https://api.themoviedb.org/3';
 
 const options = {

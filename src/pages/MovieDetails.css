@@ -92,9 +92,9 @@
 }
 
 .genre-pill {
-  background: rgba(109, 40, 217, 0.2);
-  color: #c4b5fd;
-  border: 1px solid rgba(109, 40, 217, 0.4);
+  background: rgba(255, 183, 3, 0.15);
+  color: var(--primary);
+  border: 1px solid rgba(255, 183, 3, 0.4);
   padding: 0.3rem 0.8rem;
   border-radius: 4px;
   font-size: 0.875rem;

@@ -7,7 +7,7 @@
   padding: 1rem 0;
   border-bottom: 1px solid var(--glass-border);
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
-  background: rgba(10, 10, 15, 0.7);
+  background: rgba(10, 25, 47, 0.85);
 }
 
 .nav-container {
@@ -115,7 +115,7 @@
     top: 100%;
     left: 0;
     right: 0;
-    background: rgba(10, 10, 15, 0.95);
+    background: rgba(10, 25, 47, 0.95);
     backdrop-filter: blur(16px);
     flex-direction: column;
     padding: 2rem;

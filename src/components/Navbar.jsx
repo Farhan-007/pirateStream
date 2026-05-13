@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, Film, History, Home, Menu, X } from 'lucide-react';
+import { Search, Skull, History, Home, Menu, X } from 'lucide-react';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -21,7 +21,7 @@ const Navbar = () => {
     <nav className="navbar glass">
       <div className="container nav-container">
         <Link to="/" className="brand">
-          <Film className="brand-icon" />
+          <Skull className="brand-icon" />
           <span className="gradient-text">Pirate Stream</span>
         </Link>
 

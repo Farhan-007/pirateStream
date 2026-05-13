@@ -1,0 +1,22 @@
+.search-page {
+  padding-top: 100px; /* space for navbar */
+  padding-bottom: 4rem;
+  min-height: calc(100vh - 100px);
+}
+
+.search-header {
+  margin-bottom: 3rem;
+}
+
+.search-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .search-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 2rem;
+  }
+}

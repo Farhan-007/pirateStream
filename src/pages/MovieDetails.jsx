@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchMovieDetails, getImageUrl } from '../utils/api';
 import { useWatchHistory } from '../hooks/useWatchHistory';
-import { Star, Calendar, Clock, Play } from 'lucide-react';
+import { Star, Calendar, Clock, Play, Clapperboard, X } from 'lucide-react';
 import MovieCard from '../components/MovieCard';
 import './MovieDetails.css';
 
@@ -12,6 +12,8 @@ const MovieDetails = () => {
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
   const { addToHistory } = useWatchHistory();
+  const [trailerKey, setTrailerKey] = useState(null);
+  const [showTrailer, setShowTrailer] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -19,7 +21,14 @@ const MovieDetails = () => {
       try {
         const data = await fetchMovieDetails(id, type);
         setMovie(data);
-        console.log(data);
+
+        // Pick best trailer from videos
+        const videos = data.videos?.results || [];
+        const trailer =
+          videos.find(v => v.type === 'Trailer' && v.site === 'YouTube') ||
+          videos.find(v => v.site === 'YouTube');
+        setTrailerKey(trailer?.key || null);
+
         addToHistory({
           id: data.id,
           title: data.title || data.name,
@@ -30,7 +39,7 @@ const MovieDetails = () => {
         });
         window.scrollTo(0, 0);
       } catch (error) {
-        console.error("Error loading movie", error);
+        console.error('Error loading movie', error);
       } finally {
         setLoading(false);
       }
@@ -38,20 +47,68 @@ const MovieDetails = () => {
     loadData();
   }, [id]);
 
-  if (loading) {
-    return <div className="loader">Loading...</div>;
-  }
+  // Close modal on Escape key
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === 'Escape') setShowTrailer(false); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
 
-  if (!movie) {
-    return <div className="loader">Movie not found</div>;
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    document.body.style.overflow = showTrailer ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [showTrailer]);
+
+  if (loading) {
+    return (
+      <div className="md-skeleton animate-fade-in">
+        {/* backdrop */}
+        <div className="sk md-sk-backdrop" />
+        <div className="container md-sk-body">
+          {/* poster + info row */}
+          <div className="md-sk-grid">
+            <div className="sk sk-card md-sk-poster" />
+            <div className="md-sk-info">
+              <div className="sk md-sk-title" />
+              <div className="sk md-sk-title md-sk-title-sm" />
+              <div className="md-sk-badges">
+                {[1,2,3].map(i => <div key={i} className="sk sk-round md-sk-badge" />)}
+              </div>
+              <div className="md-sk-genres">
+                {[1,2,3,4].map(i => <div key={i} className="sk md-sk-genre" />)}
+              </div>
+              <div className="sk md-sk-line" />
+              <div className="sk md-sk-line" />
+              <div className="sk md-sk-line md-sk-line-sm" />
+              <div className="md-sk-actions">
+                <div className="sk sk-round md-sk-action-btn" />
+                <div className="sk sk-round md-sk-action-btn" />
+              </div>
+            </div>
+          </div>
+          {/* similar grid */}
+          <div className="sk md-sk-section-title" />
+          <div className="md-sk-similar">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="sk sk-card md-sk-sim-card" />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   }
+  if (!movie) return <div className="loader">Movie not found</div>;
+
 
   return (
     <div className="movie-details-page animate-fade-in">
-      <div className="backdrop-container" style={{
-        backgroundImage: `linear-gradient(to top, var(--bg-dark) 0%, rgba(10,10,15,0.7) 100%), url(${getImageUrl(movie.backdrop_path)})`
-      }}>
-      </div>
+      <div
+        className="backdrop-container"
+        style={{
+          backgroundImage: `linear-gradient(to top, var(--bg-dark) 0%, rgba(10,10,15,0.7) 100%), url(${getImageUrl(movie.backdrop_path)})`
+        }}
+      />
 
       <div className="container details-content">
         <div className="details-grid">
@@ -68,8 +125,8 @@ const MovieDetails = () => {
 
             <div className="meta-badges">
               <span className="badge"><Star size={16} fill="currentColor" className="star-icon" /> {movie.vote_average?.toFixed(1)}</span>
-              <span className="badge"><Calendar size={16} /> {(movie.release_date || '').split('-')[0]}</span>
-              <span className="badge"><Clock size={16} /> {movie.runtime} min</span>
+              <span className="badge"><Calendar size={16} /> {(movie.release_date || movie.first_air_date || '').split('-')[0]}</span>
+              {movie.runtime > 0 && <span className="badge"><Clock size={16} /> {movie.runtime} min</span>}
             </div>
 
             <div className="genres">
@@ -83,17 +140,29 @@ const MovieDetails = () => {
               <p>{movie.overview}</p>
             </div>
 
-            <button
-              className="btn btn-primary watch-btn"
-              onClick={() => navigate(`/watch/${type}/${id}`)}
-            >
-              <Play size={20} fill="currentColor" />
-              Stream Now
-            </button>
+            {/* ── Action buttons ── */}
+            <div className="action-btns">
+              <button
+                className="btn btn-primary watch-btn"
+                onClick={() => navigate(`/watch/${type}/${id}`)}
+              >
+                <Play size={20} fill="currentColor" />
+                Stream Now
+              </button>
+
+              {trailerKey && (
+                <button
+                  className="btn btn-trailer watch-btn"
+                  onClick={() => setShowTrailer(true)}
+                  id="trailer-btn"
+                >
+                  <Clapperboard size={20} />
+                  Watch Trailer
+                </button>
+              )}
+            </div>
           </div>
         </div>
-
-
 
         {movie.similar?.results?.length > 0 && (
           <div className="similar-section">
@@ -106,6 +175,37 @@ const MovieDetails = () => {
           </div>
         )}
       </div>
+
+      {/* ── Trailer Modal ── */}
+      {showTrailer && (
+        <div
+          className="trailer-overlay animate-fade-in"
+          onClick={() => setShowTrailer(false)}
+          id="trailer-modal-overlay"
+        >
+          <div
+            className="trailer-modal"
+            onClick={e => e.stopPropagation()}
+          >
+            <button
+              className="trailer-close"
+              onClick={() => setShowTrailer(false)}
+              aria-label="Close trailer"
+            >
+              <X size={22} />
+            </button>
+            <div className="trailer-frame-wrap">
+              <iframe
+                src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1&rel=0`}
+                title="Trailer"
+                allowFullScreen
+                allow="autoplay; fullscreen"
+                frameBorder="0"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

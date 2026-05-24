@@ -189,3 +189,32 @@ h6 {
 .section-title {
   padding: 20px 0;
 }
+
+/* ═══════════════════════════════════════
+   GLOBAL SKELETON SYSTEM
+═══════════════════════════════════════ */
+@keyframes sk-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.sk {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04) 25%,
+    rgba(255, 255, 255, 0.10) 50%,
+    rgba(255, 255, 255, 0.04) 75%
+  );
+  background-size: 200% 100%;
+  animation: sk-shimmer 1.6s infinite;
+  border-radius: 8px;
+}
+
+.sk-round  { border-radius: 9999px; }
+.sk-circle { border-radius: 50%; }
+.sk-card   { border-radius: 12px; }
+
+/* main-content must always be at least 100vh so footer never shows above fold */
+.main-content {
+  min-height: 100vh;
+}

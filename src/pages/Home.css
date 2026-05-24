@@ -2,6 +2,78 @@
   padding-bottom: 4rem;
 }
 
+/* ── Home skeleton ── */
+.home-skeleton {
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+.home-sk-hero {
+  width: 100%;
+  height: 85vh;
+  min-height: 600px;
+  border-radius: 0 !important;
+  display: flex;
+  align-items: flex-end;
+  padding: 4rem 0 5rem;
+}
+
+.home-sk-hero-content {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.home-sk-badge  { height: 32px; width: 180px; }
+.home-sk-title  { height: 52px; width: 60%; }
+.home-sk-title-sm { width: 40%; height: 42px; }
+.home-sk-overview { height: 18px; width: 55%; }
+.home-sk-overview-sm { height: 18px; width: 40%; }
+.home-sk-btn    { height: 48px; width: 160px; margin-top: 0.5rem; }
+
+.home-sk-section {
+  margin-top: 3rem;
+}
+
+.home-sk-section-title {
+  height: 28px;
+  width: 200px;
+  margin-bottom: 1.5rem;
+}
+
+.home-sk-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .home-sk-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 2rem;
+  }
+}
+
+.home-sk-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.home-sk-poster {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+}
+
+.home-sk-label    { height: 14px; width: 80%; }
+.home-sk-label-sm { height: 12px; width: 50%; }
+
+
 .loader {
   height: 100vh;
   display: flex;

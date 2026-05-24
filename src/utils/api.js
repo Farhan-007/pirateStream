@@ -28,7 +28,7 @@ export const fetchDiscover = async () => {
 };
 
 export const fetchMovieDetails = async (id, type = 'movie') => {
-  const res = await fetch(`${BASE_URL}/${type}/${id}?append_to_response=credits,similar`, options);
+  const res = await fetch(`${BASE_URL}/${type}/${id}?append_to_response=credits,similar,videos`, options);
   if (!res.ok) throw new Error('Failed to fetch movie details');
   return res.json();
 };

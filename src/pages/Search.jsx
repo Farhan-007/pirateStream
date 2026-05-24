@@ -37,7 +37,15 @@ const Search = () => {
       </div>
 
       {loading ? (
-        <div className="loader">Searching...</div>
+        <div className="search-sk-grid">
+          {Array.from({ length: 12 }).map((_, i) => (
+            <div key={i} className="search-sk-card">
+              <div className="sk sk-card search-sk-poster" />
+              <div className="sk search-sk-label" />
+              <div className="sk search-sk-label search-sk-label-sm" />
+            </div>
+          ))}
+        </div>
       ) : results.length === 0 ? (
         <div className="empty-state glass-card">
           <SearchIcon size={64} className="empty-icon" />

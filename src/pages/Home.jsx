@@ -45,7 +45,37 @@ const Home = () => {
   }, [trending]);
 
   if (loading) {
-    return <div className="loader">Loading...</div>;
+    return (
+      <div className="home-skeleton">
+        {/* Hero skeleton */}
+        <div className="sk sk-card home-sk-hero">
+          <div className="home-sk-hero-content">
+            <div className="sk sk-round home-sk-badge" />
+            <div className="sk home-sk-title" />
+            <div className="sk home-sk-title home-sk-title-sm" />
+            <div className="sk home-sk-overview" />
+            <div className="sk home-sk-overview home-sk-overview-sm" />
+            <div className="sk sk-round home-sk-btn" />
+          </div>
+        </div>
+
+        {/* Card grid sections × 3 */}
+        {[1, 2, 3].map(s => (
+          <div key={s} className="container home-sk-section">
+            <div className="sk sk-round home-sk-section-title" />
+            <div className="home-sk-grid">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="home-sk-card">
+                  <div className="sk sk-card home-sk-poster" />
+                  <div className="sk home-sk-label" />
+                  <div className="sk home-sk-label home-sk-label-sm" />
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
   }
 
   return (

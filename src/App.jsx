@@ -3,6 +3,7 @@ import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import MovieDetails from './pages/MovieDetails';
+import Watch from './pages/Watch';
 import History from './pages/History';
 import Search from './pages/Search';
 import './App.css';
@@ -16,6 +17,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/:type/:id" element={<MovieDetails />} />
+            <Route path="/watch/:type/:id" element={<Watch />} />
             <Route path="/history" element={<History />} />
             <Route path="/search" element={<Search />} />
           </Routes>

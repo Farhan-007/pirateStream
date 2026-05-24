@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { fetchMovieDetails, getImageUrl } from '../utils/api';
 import { useWatchHistory } from '../hooks/useWatchHistory';
 import { Star, Calendar, Clock, Play } from 'lucide-react';
@@ -8,12 +8,10 @@ import './MovieDetails.css';
 
 const MovieDetails = () => {
   const { type = 'movie', id } = useParams();
+  const navigate = useNavigate();
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
   const { addToHistory } = useWatchHistory();
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [season, setSeason] = useState(1);
-  const [episode, setEpisode] = useState(1);
 
   useEffect(() => {
     const loadData = async () => {
@@ -31,7 +29,6 @@ const MovieDetails = () => {
           media_type: type
         });
         window.scrollTo(0, 0);
-        setIsPlaying(false);
       } catch (error) {
         console.error("Error loading movie", error);
       } finally {
@@ -88,7 +85,7 @@ const MovieDetails = () => {
 
             <button
               className="btn btn-primary watch-btn"
-              onClick={() => setIsPlaying(true)}
+              onClick={() => navigate(`/watch/${type}/${id}`)}
             >
               <Play size={20} fill="currentColor" />
               Stream Now
@@ -96,49 +93,7 @@ const MovieDetails = () => {
           </div>
         </div>
 
-        {isPlaying && (
-          <div className="player-section animate-fade-in">
-            <h2 className="section-title">Streaming <span className="gradient-text">Player</span></h2>
 
-            {type === 'tv' && movie.seasons && (
-              <div className="episode-selector">
-                <select
-                  value={season}
-                  onChange={(e) => {
-                    setSeason(e.target.value);
-                    setEpisode(1);
-                  }}
-                  className="season-select glass-card"
-                >
-                  {movie.seasons.filter(s => s.season_number > 0).map(s => (
-                    <option key={s.id} value={s.season_number}>Season {s.season_number}</option>
-                  ))}
-                </select>
-                <div className="episode-input-container">
-                  <label htmlFor="episode-input">Episode:</label>
-                  <input
-                    id="episode-input"
-                    type="number"
-                    min="1"
-                    value={episode}
-                    onChange={(e) => setEpisode(e.target.value)}
-                    className="episode-input glass-card"
-                  />
-                </div>
-              </div>
-            )}
-
-            <div className="iframe-container glass-card">
-              <iframe
-                src={type === 'tv' ? `https://vidfast.pro/tv/${movie.id}/${season}/${episode}` : `https://vidfast.pro/movie/${movie.id}`}
-                allowFullScreen
-                title="Movie Player"
-                frameBorder="0"
-                className="movie-iframe"
-              ></iframe>
-            </div>
-          </div>
-        )}
 
         {movie.similar?.results?.length > 0 && (
           <div className="similar-section">

@@ -33,6 +33,12 @@ export const fetchMovieDetails = async (id, type = 'movie') => {
   return res.json();
 };
 
+export const fetchSeasonDetails = async (seriesId, seasonNumber) => {
+  const res = await fetch(`${BASE_URL}/tv/${seriesId}/season/${seasonNumber}`, options);
+  if (!res.ok) throw new Error('Failed to fetch season details');
+  return res.json();
+};
+
 export const searchMovies = async (query) => {
   const res = await fetch(`${BASE_URL}/search/multi?query=${encodeURIComponent(query)}`, options);
   if (!res.ok) throw new Error('Failed to search');

@@ -14,8 +14,44 @@ const MovieDetails = () => {
   const { addToHistory } = useWatchHistory();
   const [trailerKey, setTrailerKey] = useState(null);
   const [showTrailer, setShowTrailer] = useState(false);
+  const [savedProgress, setSavedProgress] = useState(null);
 
   useEffect(() => {
+    // Load individual TV show progress if applicable
+    if (type === 'tv') {
+      const playerProgressStr = window.localStorage.getItem(`progress:${id}`);
+      const oldProgressStr = window.localStorage.getItem(`pirate_stream_tv_progress_${id}`);
+      
+      if (playerProgressStr) {
+        try {
+          const progressObj = JSON.parse(playerProgressStr);
+          if (progressObj && progressObj.last_season_watched) {
+            setSavedProgress({
+              season: parseInt(progressObj.last_season_watched, 10),
+              episode: parseInt(progressObj.last_episode_watched, 10) || 1
+            });
+          } else {
+            setSavedProgress(null);
+          }
+        } catch (e) {
+          setSavedProgress(null);
+        }
+      } else if (oldProgressStr) {
+        try {
+          const progress = JSON.parse(oldProgressStr);
+          if (progress && progress.season) {
+            setSavedProgress(progress);
+          }
+        } catch (e) {
+          setSavedProgress(null);
+        }
+      } else {
+        setSavedProgress(null);
+      }
+    } else {
+      setSavedProgress(null);
+    }
+
     const loadData = async () => {
       setLoading(true);
       try {
@@ -45,7 +81,7 @@ const MovieDetails = () => {
       }
     };
     loadData();
-  }, [id]);
+  }, [id, type]);
 
   // Close modal on Escape key
   useEffect(() => {
@@ -142,13 +178,23 @@ const MovieDetails = () => {
 
             {/* ── Action buttons ── */}
             <div className="action-btns">
-              <button
-                className="btn btn-primary watch-btn"
-                onClick={() => navigate(`/watch/${type}/${id}`)}
-              >
-                <Play size={20} fill="currentColor" />
-                Stream Now
-              </button>
+              {savedProgress ? (
+                <button
+                  className="btn btn-primary watch-btn"
+                  onClick={() => navigate(`/watch/${type}/${id}?season=${savedProgress.season}&episode=${savedProgress.episode}`)}
+                >
+                  <Play size={20} fill="currentColor" />
+                  Resume S{savedProgress.season} E{savedProgress.episode}
+                </button>
+              ) : (
+                <button
+                  className="btn btn-primary watch-btn"
+                  onClick={() => navigate(`/watch/${type}/${id}`)}
+                >
+                  <Play size={20} fill="currentColor" />
+                  Stream Now
+                </button>
+              )}
 
               {trailerKey && (
                 <button

@@ -20,13 +20,13 @@ const Navbar = () => {
   return (
     <nav className="navbar glass">
       <div className="container nav-container">
-        <Link to="/" className="brand">
+        <Link to="/home" className="brand">
           <Skull className="brand-icon" />
           <span className="gradient-text">Pirate Stream</span>
         </Link>
 
         <div className={`nav-links ${isOpen ? 'open' : ''}`}>
-          <Link to="/" onClick={() => setIsOpen(false)} className="nav-item">
+          <Link to="/home" onClick={() => setIsOpen(false)} className="nav-item">
             <Home size={18} />
             Home
           </Link>

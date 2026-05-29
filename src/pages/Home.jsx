@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { fetchTrending, fetchTopRated, fetchDiscover } from '../utils/api';
 import MovieCard from '../components/MovieCard';
 import './Home.css';
-import { Play, TrendingUp } from 'lucide-react';
+import { Play, TrendingUp, Tv, Film, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { getImageUrl } from '../utils/api';
 
@@ -12,6 +12,28 @@ const Home = () => {
   const [discover, setDiscover] = useState([]);
   const [activeHeroIndex, setActiveHeroIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [lastWatched, setLastWatched] = useState(null);
+
+  useEffect(() => {
+    const savedStr = window.localStorage.getItem('pirate_stream_last_watched');
+    if (savedStr) {
+      try {
+        const saved = JSON.parse(savedStr);
+        if (saved && saved.id) {
+          setLastWatched(saved);
+        }
+      } catch (e) {
+        console.error("Error parsing last watched state", e);
+      }
+    }
+  }, []);
+
+  const handleDismissLastWatched = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    window.localStorage.removeItem('pirate_stream_last_watched');
+    setLastWatched(null);
+  };
 
   useEffect(() => {
     const loadData = async () => {
@@ -122,6 +144,58 @@ const Home = () => {
       )}
 
       <div className="container sections-container">
+        {lastWatched && (
+          <section className="continue-section">
+            <div className="section-header">
+              <h2 className="section-title">Continue <span className="gradient-text">Watching</span></h2>
+            </div>
+            <div className="continue-card-wrapper">
+              <button 
+                className="continue-dismiss-btn" 
+                onClick={handleDismissLastWatched}
+                title="Clear Continue Watching"
+              >
+                <X size={16} />
+              </button>
+              <Link 
+                to={`/watch/${lastWatched.type}/${lastWatched.id}${lastWatched.type === 'tv' ? `?season=${lastWatched.season}&episode=${lastWatched.episode}` : ''}`} 
+                className="continue-card"
+              >
+                <div className="continue-poster-wrap">
+                  <img 
+                    src={getImageUrl(lastWatched.poster_path, 'w185')} 
+                    alt={lastWatched.title} 
+                    className="continue-poster"
+                  />
+                  <div className="continue-poster-overlay">
+                    <Play size={24} fill="currentColor" className="continue-play-icon" />
+                  </div>
+                </div>
+                <div className="continue-info">
+                  <span className="continue-media-tag">
+                    {lastWatched.type === 'tv' ? <Tv size={12} /> : <Film size={12} />}
+                    {lastWatched.type === 'tv' ? 'Series' : 'Movie'}
+                  </span>
+                  <h3 className="continue-title">{lastWatched.title}</h3>
+                  <span className="continue-details">
+                    {lastWatched.type === 'tv' 
+                      ? `Season ${lastWatched.season} · Episode ${lastWatched.episode}` 
+                      : 'Resume Movie'}
+                  </span>
+                  <div className="continue-progress-wrap">
+                    <div className="continue-progress-label">
+                      <span>Progress</span>
+                      <span>100%</span>
+                    </div>
+                    <div className="continue-progress-bar">
+                      <div className="continue-progress-fill" />
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            </div>
+          </section>
+        )}
         <section className="movie-section">
           <div className="section-header">
             <h2 className="section-title">Trending <span className="gradient-text">Now</span></h2>

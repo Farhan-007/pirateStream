@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { fetchMovieDetails, fetchSeasonDetails, getImageUrl } from '../utils/api';
 import { Star, Calendar, Clock, ArrowLeft, Play, Tv, Film } from 'lucide-react';
 import './Watch.css';
@@ -7,18 +7,13 @@ import './Watch.css';
 const Watch = () => {
   const { type = 'movie', id } = useParams();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const paramSeason = searchParams.get('season');
-  const paramEpisode = searchParams.get('episode');
 
   const [media, setMedia] = useState(null);
   const [loadingMedia, setLoadingMedia] = useState(true);
 
-  // Initialize selected season and episode from query parameters, individual TV progress keys, or old progress keys
+  // Initialize selected season and episode from individual TV progress keys, or old progress keys
   const [selectedSeason, setSelectedSeason] = useState(() => {
     if (type === 'tv') {
-      if (paramSeason) return parseInt(paramSeason, 10);
-      
       // 1. Check progress:${id} key (matches player format)
       const playerProgressStr = window.localStorage.getItem(`progress:${id}`);
       if (playerProgressStr) {
@@ -57,8 +52,6 @@ const Watch = () => {
 
   const [selectedEpisode, setSelectedEpisode] = useState(() => {
     if (type === 'tv') {
-      if (paramEpisode) return parseInt(paramEpisode, 10);
-
       // 1. Check progress:${id} key (matches player format)
       const playerProgressStr = window.localStorage.getItem(`progress:${id}`);
       if (playerProgressStr) {
@@ -237,18 +230,31 @@ const Watch = () => {
         let initialEpisode = 1;
 
         if (type === 'tv' && data.seasons?.length) {
-          if (paramSeason && paramEpisode) {
-            initialSeason = parseInt(paramSeason, 10);
-            initialEpisode = parseInt(paramEpisode, 10);
+          // 1. Check individual show progress using progress:${id}
+          const tvProgressStr = window.localStorage.getItem(`progress:${id}`);
+          if (tvProgressStr) {
+            try {
+              const tvProgress = JSON.parse(tvProgressStr);
+              if (tvProgress && tvProgress.last_season_watched) {
+                initialSeason = tvProgress.last_season_watched;
+                initialEpisode = tvProgress.last_episode_watched || 1;
+              } else {
+                const firstReal = data.seasons.find(s => s.season_number > 0);
+                if (firstReal) initialSeason = firstReal.season_number;
+              }
+            } catch (e) {
+              const firstReal = data.seasons.find(s => s.season_number > 0);
+              if (firstReal) initialSeason = firstReal.season_number;
+            }
           } else {
-            // 1. Check individual show progress using progress:${id}
-            const tvProgressStr = window.localStorage.getItem(`progress:${id}`);
-            if (tvProgressStr) {
+            // 2. Fall back to old show progress if available
+            const oldProgressStr = window.localStorage.getItem(`pirate_stream_tv_progress_${id}`);
+            if (oldProgressStr) {
               try {
-                const tvProgress = JSON.parse(tvProgressStr);
-                if (tvProgress && tvProgress.last_season_watched) {
-                  initialSeason = tvProgress.last_season_watched;
-                  initialEpisode = tvProgress.last_episode_watched || 1;
+                const oldProgress = JSON.parse(oldProgressStr);
+                if (oldProgress && oldProgress.season) {
+                  initialSeason = oldProgress.season;
+                  initialEpisode = oldProgress.episode || 1;
                 } else {
                   const firstReal = data.seasons.find(s => s.season_number > 0);
                   if (firstReal) initialSeason = firstReal.season_number;
@@ -258,38 +264,20 @@ const Watch = () => {
                 if (firstReal) initialSeason = firstReal.season_number;
               }
             } else {
-              // 2. Fall back to old show progress if available
-              const oldProgressStr = window.localStorage.getItem(`pirate_stream_tv_progress_${id}`);
-              if (oldProgressStr) {
-                try {
-                  const oldProgress = JSON.parse(oldProgressStr);
-                  if (oldProgress && oldProgress.season) {
-                    initialSeason = oldProgress.season;
-                    initialEpisode = oldProgress.episode || 1;
-                  } else {
-                    const firstReal = data.seasons.find(s => s.season_number > 0);
-                    if (firstReal) initialSeason = firstReal.season_number;
-                  }
-                } catch (e) {
-                  const firstReal = data.seasons.find(s => s.season_number > 0);
-                  if (firstReal) initialSeason = firstReal.season_number;
-                }
-              } else {
-                // 3. Fall back to overall last watched if matching
-                const savedStr = window.localStorage.getItem('pirate_stream_last_watched');
-                if (savedStr) {
-                  const saved = JSON.parse(savedStr);
-                  if (saved && String(saved.id) === String(id) && saved.type === 'tv' && saved.season) {
-                    initialSeason = saved.season;
-                    initialEpisode = saved.episode || 1;
-                  } else {
-                    const firstReal = data.seasons.find(s => s.season_number > 0);
-                    if (firstReal) initialSeason = firstReal.season_number;
-                  }
+              // 3. Fall back to overall last watched if matching
+              const savedStr = window.localStorage.getItem('pirate_stream_last_watched');
+              if (savedStr) {
+                const saved = JSON.parse(savedStr);
+                if (saved && String(saved.id) === String(id) && saved.type === 'tv' && saved.season) {
+                  initialSeason = saved.season;
+                  initialEpisode = saved.episode || 1;
                 } else {
                   const firstReal = data.seasons.find(s => s.season_number > 0);
                   if (firstReal) initialSeason = firstReal.season_number;
                 }
+              } else {
+                const firstReal = data.seasons.find(s => s.season_number > 0);
+                if (firstReal) initialSeason = firstReal.season_number;
               }
             }
           }
@@ -307,7 +295,7 @@ const Watch = () => {
       }
     };
     load();
-  }, [id, type, paramSeason, paramEpisode]);
+  }, [id, type]);
 
   /* ── Load episodes when season changes ── */
   useEffect(() => {

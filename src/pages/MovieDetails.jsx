@@ -181,7 +181,7 @@ const MovieDetails = () => {
               {savedProgress ? (
                 <button
                   className="btn btn-primary watch-btn"
-                  onClick={() => navigate(`/watch/${type}/${id}?season=${savedProgress.season}&episode=${savedProgress.episode}`)}
+                  onClick={() => navigate(`/watch/${type}/${id}`)}
                 >
                   <Play size={20} fill="currentColor" />
                   Resume S{savedProgress.season} E{savedProgress.episode}

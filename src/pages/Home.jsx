@@ -158,7 +158,7 @@ const Home = () => {
                 <X size={16} />
               </button>
               <Link 
-                to={`/watch/${lastWatched.type}/${lastWatched.id}${lastWatched.type === 'tv' ? `?season=${lastWatched.season}&episode=${lastWatched.episode}` : ''}`} 
+                to={`/watch/${lastWatched.type}/${lastWatched.id}`} 
                 className="continue-card"
               >
                 <div className="continue-poster-wrap">

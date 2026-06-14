@@ -196,7 +196,7 @@
 ═══════════════════════════════════════════ */
 .episode-list {
   list-style: none;
-  max-height: 480px;
+  /* max-height: 480px; */
   overflow-y: auto;
   padding: 0.5rem;
   display: flex;

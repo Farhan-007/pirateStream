@@ -18,7 +18,7 @@ const Watch = () => {
   const [selectedSeason, setSelectedSeason] = useState(() => {
     if (type === 'tv') {
       if (paramSeason) return parseInt(paramSeason, 10);
-      
+
       // 1. Check progress:${id} key (matches player format)
       const playerProgressStr = window.localStorage.getItem(`progress:${id}`);
       if (playerProgressStr) {
@@ -27,7 +27,7 @@ const Watch = () => {
           if (progress && progress.last_season_watched) {
             return parseInt(progress.last_season_watched, 10);
           }
-        } catch (e) {}
+        } catch (e) { }
       }
 
       // 2. Check old individual progress key
@@ -38,7 +38,7 @@ const Watch = () => {
           if (tvProgress && tvProgress.season) {
             return tvProgress.season;
           }
-        } catch (e) {}
+        } catch (e) { }
       }
 
       // 3. Fall back to overall last watched
@@ -49,7 +49,7 @@ const Watch = () => {
           if (saved && String(saved.id) === String(id) && saved.type === 'tv' && saved.season) {
             return saved.season;
           }
-        } catch (e) {}
+        } catch (e) { }
       }
     }
     return 1;
@@ -67,7 +67,7 @@ const Watch = () => {
           if (progress && progress.last_episode_watched) {
             return parseInt(progress.last_episode_watched, 10);
           }
-        } catch (e) {}
+        } catch (e) { }
       }
 
       // 2. Check old individual progress key
@@ -78,7 +78,7 @@ const Watch = () => {
           if (tvProgress && tvProgress.episode) {
             return tvProgress.episode;
           }
-        } catch (e) {}
+        } catch (e) { }
       }
 
       // 3. Fall back to overall last watched
@@ -89,7 +89,7 @@ const Watch = () => {
           if (saved && String(saved.id) === String(id) && saved.type === 'tv' && saved.episode) {
             return saved.episode;
           }
-        } catch (e) {}
+        } catch (e) { }
       }
     }
     return 1;
@@ -115,7 +115,7 @@ const Watch = () => {
     const handleMessage = (event) => {
       // Validate origin to ensure it's from the player iframe
       if (!event.origin.includes('vidfast.pro') && !event.origin.includes('vidfast')) return;
-      
+
       try {
         const payload = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
         if (!payload) return;
@@ -126,7 +126,7 @@ const Watch = () => {
         if (payload.last_season_watched || payload.last_episode_watched || payload.progress) {
           const season = parseInt(payload.last_season_watched || payload.season, 10);
           const episode = parseInt(payload.last_episode_watched || payload.episode, 10);
-          
+
           if (!isNaN(season) && season > 0) {
             setSelectedSeason(season);
           }
@@ -139,7 +139,7 @@ const Watch = () => {
           const existingStr = window.localStorage.getItem(progressKey);
           let existingObj = {};
           if (existingStr) {
-            try { existingObj = JSON.parse(existingStr); } catch (e) {}
+            try { existingObj = JSON.parse(existingStr); } catch (e) { }
           }
 
           // Build merged progress object
@@ -185,7 +185,7 @@ const Watch = () => {
     if (existingStr) {
       try {
         existingObj = JSON.parse(existingStr);
-      } catch (e) {}
+      } catch (e) { }
     }
 
     const updatedObj = {
@@ -318,7 +318,7 @@ const Watch = () => {
       try {
         const data = await fetchSeasonDetails(id, selectedSeason);
         setEpisodes(data.episodes || []);
-        
+
         if (isInitialLoad.current) {
           isInitialLoad.current = false;
         } else {
@@ -426,6 +426,8 @@ const Watch = () => {
         {isTv && seasons.length > 0 && (
           <div className="watch-sidebar">
             {/* Season pills — desktop: top of sidebar; mobile: after episode list */}
+            {/* Season pills — mobile only (appears after episode list) */}
+            <SeasonPills className="mobile-seasons" />
             <SeasonPills className="desktop-seasons" />
             {/* Episode list */}
             <div className="sidebar-section">
@@ -460,8 +462,6 @@ const Watch = () => {
                   ))}
               </ul>
             </div>
-            {/* Season pills — mobile only (appears after episode list) */}
-            <SeasonPills className="mobile-seasons" />
           </div>
         )}
         {/* ── MAIN ── */}
